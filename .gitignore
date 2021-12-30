@@ -1,0 +1,5 @@
+node_modules
+._.DS_Store
+_DS_Store
+trash.ts.dead
+vsc-extension-quickstart.md
