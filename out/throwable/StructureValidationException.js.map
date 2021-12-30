@@ -1,1 +1,0 @@
-{"version":3,"file":"StructureValidationException.js","sourceRoot":"","sources":["../../src/throwable/StructureValidationException.ts"],"names":[],"mappings":";;;;;;;;;AACA,2CAAoC;AAEpC,MAAqB,4BAA6B,SAAQ,mBAAS;IAG/D,YAAY,QAA0C,EAAE,OAAe;QACnE,KAAK,CAAC,OAAO,CAAC,CAAC;QAHnB,yDAAkB;QAId,uBAAA,IAAI,0CAAc,QAAQ,CAAC,WAAmB,CAAC,IAAI,MAAA,CAAC;IACxD,CAAC;CACJ;AAPD,+CAOC"}
