@@ -1,14 +1,18 @@
 {
   "name": "data-replacer",
   "displayName": "data-replacer",
+  "icon": "images/struct_replacer_logo.png",
   "author": {
     "email": "grano22@outlook.com",
     "name": "Grano22",
     "url": "https://adrianblasiak.pl/"
   },
   "publisher": "grano22",
+  "repository": {
+    "url": "https://github.com/Grano22/structure-replacer-vse"
+  },
   "description": "Data replacer is a extension to convert between data structures",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "engines": {
     "vscode": "^1.62.0"
   },
@@ -59,7 +63,7 @@
     "@types/glob": "^7.1.4",
     "@types/mocha": "^9.0.0",
     "@types/node": "14.x",
-    "@types/vscode": "^1.63.0",
+    "@types/vscode": "^1.62.0",
     "@types/yamljs": "^0.2.31",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",

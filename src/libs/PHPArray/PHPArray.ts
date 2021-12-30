@@ -68,19 +68,20 @@ export default class PHPArray {
     }
 
     public static stringify(obj : Record<string, any>, options : Record<string, any>): string {
+        options = Object.assign({ before:0 }, options);
         let phpArrayStr = '[\n';
         for(const objProp in obj) {
             const objKey = options.quoteType + objProp + options.quoteType;
             if(typeof obj[objProp] === "object") {
-                phpArrayStr += " ".repeat(options.space) + objKey + " => " + this.stringify(obj[objProp], options) + "\n";
+                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + this.stringify(obj[objProp], { quoteType:options.quoteType, space:options.space, before:options.before + options.space }) + ",\n";
             } else {
                 let objValue = obj[objProp];
                 if (typeof objValue === "string") {
                     objValue = options.quoteType + objValue + options.quoteType;
                 }
-                phpArrayStr += " ".repeat(options.space) + objKey + " => " + objValue + "\n";
+                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + objValue + ",\n";
             }
         }
-        return phpArrayStr + ']';
+        return phpArrayStr + " ".repeat(options.before) + ']';
     }
 }
