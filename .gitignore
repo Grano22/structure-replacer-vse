@@ -1,0 +1,12 @@
+node_modules
+node_modules/**
+._.DS_Store
+_DS_Store
+trash.ts.dead
+vsc-extension-quickstart.md
+.vscode
+.vscode/**
+.vscode-test
+.vscode-test/**
+package-lock.json
+out
