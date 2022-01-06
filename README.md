@@ -4,8 +4,11 @@
 
 Supported structures (two way converting):
 * JSON
+* Minified JSON
 * Y(A)ML
 * PHP Array
+* Minified PHP Array
+* XML (Beta)
 
 ### Commands Pallete
 

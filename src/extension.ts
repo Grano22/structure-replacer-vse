@@ -11,15 +11,37 @@ import StructureDetector from './detector/StructureDetector';
 import subactionSelector from './gui/dialog/subactionSelector';
 import items, { ConvertToActionQuickPickItem } from './gui/quickPickMenu/items';
 import StructuresDefinitionManager from './managers/StructuresDefinitionManager';
+import ToSQLTableDefinitionStructureConverter from "./converter/fromCurrLang/ToSQLTableDefinitionStructureConveter";
+import ToJSONStructureConverter from './converter/fromCurrLang/ToJSONStructureConverter';
+import ToYMLStructureConverter from './converter/fromCurrLang/ToYMLStructureConverter';
+import ToPHPArrayStructureConverter from './converter/fromCurrLang/ToPHPArrayStructureConverter';
+import SidepanelMenuProivder from './gui/sidepanel/SidepanelMenuProvider';
+import DataReplacerExtensionFasade from './fasades/DataReplacerExtensionFasade';
+import ToXMLStructureConverter from './converter/fromCurrLang/ToXMLStructureConverter';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	const extensionSettings : ExtensionSettings = vscode.workspace.getConfiguration('vestibule-bs') as ExtensionSettings;
 	const structMng = new StructuresDefinitionManager({
 		allowedStructures:[],
-		disallowedStructures:[]
-	});
-	
-	const disposableReplaceDataStruct = vscode.commands.registerCommand('data_replacer.replace_data_structure', () => {
+		disallowedStructures:[],
+		nativeLangConverters:[
+			new ToJSONStructureConverter(),
+			new ToPHPArrayStructureConverter(),
+			new ToYMLStructureConverter(),
+			new ToSQLTableDefinitionStructureConverter(),
+			new ToXMLStructureConverter()
+		]
+	}),
+	extAccessor = new DataReplacerExtensionFasade(
+		structMng,
+		extensionSettings
+	);
+
+	const disposable : Record<string, any> = {}, sidebarProvider = new SidepanelMenuProivder(context.extensionUri, extAccessor);
+
+	disposable["SidebarStructuresMenu"] = vscode.window.registerWebviewViewProvider(SidepanelMenuProivder.viewType, sidebarProvider);
+
+	disposable["ReplaceDataStruct"] = vscode.commands.registerCommand('data_replacer.replace_data_structure', () => {
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -60,12 +82,12 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-			if(tgStruct === structureID) {
+			/*if(tgStruct === structureID) {
 				vscode.window.showInformationMessage(`Structure cannot be converted due is already ${structureID}`);
 				return;
-			}
+			}*/
 
-			const outputStruct = structMng.convertTo(selectedAllRange, structureID, tgStruct);
+			const outputStruct = structMng.convertTo(selectedAllRange, structureID, tgStruct, selectedOutputStruct?.convertionOptions);
 			if (structMng.hasErrors) {
 				vscode.window.showErrorMessage(`Failed to convert from ${structureID} to ${tgStruct} structure type due to ${structMng.errors.join("\n")}`);
 			} else {
@@ -76,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
-	const disposableGenerateFileWithDataStruct = vscode.commands.registerCommand('data_replacer.generate_file_data_structure', () => {
+	disposable["GenerateFileWithDataStruct"] = vscode.commands.registerCommand('data_replacer.generate_file_data_structure', () => {
 		var editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return;
@@ -117,12 +139,12 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-			if(tgStruct === structureID) {
+			/*if(tgStruct === structureID) {
 				vscode.window.showInformationMessage(`Structure cannot be converted due is already ${structureID}`);
 				return;
-			}
+			}*/
 
-			const outputStruct = structMng.convertTo(selectedAllRange, structureID, tgStruct);
+			const outputStruct = structMng.convertTo(selectedAllRange, structureID, tgStruct, selectedOutputStruct?.convertionOptions);
 			if (structMng.hasErrors) {
 				vscode.window.showErrorMessage(`Failed to convert from ${structureID} to ${tgStruct} structure type due to ${structMng.errors.join("\n")}`);
 			} else {
@@ -135,8 +157,50 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
-	context.subscriptions.push(disposableReplaceDataStruct);
-	context.subscriptions.push(disposableGenerateFileWithDataStruct);
+	disposable['ValidateDataStruct'] = vscode.commands.registerCommand('data_replacer.validate_data_structure', () => {
+		var editor = vscode.window.activeTextEditor;
+
+		if (!editor) {
+			return;
+		}
+
+		var selection = editor.selection;
+		var selectedAllRange = editor.document.getText(selection);
+
+		if (selectedAllRange.length <= 0) {
+			vscode.window.showInformationMessage('Any text required to detect data structure');
+			return;
+		}
+		
+		const allItems = items as ConvertToActionQuickPickItem[];
+
+		vscode.window.showQuickPick(
+			allItems,
+			{
+				title: 'Select target structure',
+				placeHolder: 'Select a subaction'
+			}
+
+		).then(async selectedValidationTypeStruct => {
+			const tgStruct = selectedValidationTypeStruct?.id || '';
+
+			if(tgStruct === '') {
+				vscode.window.showInformationMessage(`Target structure is invalid`);
+				return;
+			}
+
+			const tgDefinition = structMng.getDefinition(tgStruct), structValidators = tgDefinition?.validators;
+			if(Array.isArray(structValidators)) {
+				for (const structValidator of structValidators) {
+					structValidator.validate(selection);
+				}
+			}
+		});
+	});
+
+	for (const disposableEvent in disposable) {
+		context.subscriptions.push(disposable[disposableEvent]);
+	}
 }
 
 export function deactivate() {

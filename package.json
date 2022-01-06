@@ -12,16 +12,19 @@
     "url": "https://github.com/Grano22/structure-replacer-vse"
   },
   "description": "Data replacer is a extension to convert between data structures",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "engines": {
     "vscode": "^1.62.0"
   },
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:data_replacer.replace_data_structure",
-    "onCommand:data_replacer.generate_file_data_structure"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -33,8 +36,32 @@
       {
         "command": "data_replacer.generate_file_data_structure",
         "title": "Generate file with data structure"
+      },
+      {
+        "command": "data_replacer.validate_data_structure",
+        "title": "Validate data structure"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "datareplacer-sidebar-view",
+          "title": "Structure replacer",
+          "icon": "images/struct_replacer_icon.png"
+        }
+      ]
+    },
+    "views": {
+      "datareplacer-sidebar-view": [
+        {
+          "type": "webview",
+          "id": "dataReplacer.structureView",
+          "name": "Structures info",
+          "icon": "images/struct_replacer_icon.png",
+          "contextualTitle": "Structures info"
+        }
+      ]
+    },
     "configuration": {
       "title": "Data Replacer",
       "properties": {
@@ -56,7 +83,7 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "test-once": "./node_modules/mocha/bin/mocha ./src/test/unit/src/**/*.spec.ts --require ts-node/register"
+    "unit-test": "./node_modules/mocha/bin/mocha ./src/test/unit/src/**/*.spec.ts --require ts-node/register"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
@@ -64,6 +91,8 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "14.x",
     "@types/vscode": "^1.62.0",
+    "@types/xml-parser": "^1.2.30",
+    "@types/xmldom": "^0.1.31",
     "@types/yamljs": "^0.2.31",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
@@ -78,8 +107,10 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^0.8.5",
     "php-parser": "^3.0.3",
     "ts-node": "^10.4.0",
+    "xmldom": "^0.6.0",
     "yamljs": "^0.3.0"
   }
 }

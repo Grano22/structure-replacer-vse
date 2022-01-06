@@ -1,10 +1,12 @@
 import JSONStructureConverter from "../converter/JSONStructureConverter";
 import PHPArrayStructureConverter from "../converter/PHPArrayStructureConverter";
 import TextPairsStructureConverter from "../converter/TextPairsStructureConverter";
+import XMLStructureConverter from "../converter/XMLStructureConverter";
 import YMLStructureConverter from "../converter/YMLStructureConverter";
 import JSONStructureValidator from "../validators/JSONStructureValidator";
 import PHPArrayStructureValidator from "../validators/PHPArrayStructureValidator";
 import TextPairsStructureValidator from "../validators/TextPairsStructureValidator";
+import XMLStructureValidator from "../validators/XMLStructureValidator";
 import YMLStructureValidator from "../validators/YMLStructureValidator";
 
 export interface StructureDefinitionEntry {
@@ -68,6 +70,19 @@ export default [
         ],
         converters: {
             '*': PHPArrayStructureConverter
+        }
+    },
+    {
+        id:'XML',
+        name:'XML',
+        preferredMimes: ['application/xml', 'text/xml'],
+        languageContexts: ['xml'],
+        languages: ['xml'],
+        validators: [
+            XMLStructureValidator
+        ],
+        converters: {
+            "*": XMLStructureConverter
         }
     }
 ];

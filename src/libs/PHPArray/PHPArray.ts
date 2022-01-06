@@ -68,18 +68,35 @@ export default class PHPArray {
     }
 
     public static stringify(obj : Record<string, any>, options : Record<string, any>): string {
-        options = Object.assign({ before:0 }, options);
-        let phpArrayStr = '[\n';
-        for(const objProp in obj) {
+        options = Object.assign({ before:0, newLines:true, lastComma:true }, options);
+        let phpArrayStr = '[';
+        if (options.newLines) {
+          phpArrayStr += "\n";
+        }
+        const objKeys = Object.keys(obj) as string[];
+        for(const objKeyInd in objKeys) {
+            const objProp = objKeys[objKeyInd];
             const objKey = options.quoteType + objProp + options.quoteType;
             if(typeof obj[objProp] === "object") {
-                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + this.stringify(obj[objProp], { quoteType:options.quoteType, space:options.space, before:options.before + options.space }) + ",\n";
+                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + this.stringify(obj[objProp], { quoteType:options.quoteType, space:options.space, before:options.before + options.space, newLines:options.newLines, lastComma:options.lastComma });
+                if (options.lastComma || +objKeyInd < objKeys.length - 1) {
+                  phpArrayStr += ",";
+                }
+                if (options.newLines) {
+                  phpArrayStr += "\n";
+                }
             } else {
                 let objValue = obj[objProp];
                 if (typeof objValue === "string") {
                     objValue = options.quoteType + objValue + options.quoteType;
                 }
-                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + objValue + ",\n";
+                phpArrayStr += " ".repeat(options.before) + " ".repeat(options.space) + objKey + " => " + objValue; 
+                if (options.lastComma || +objKeyInd < objKeys.length - 1) {
+                  phpArrayStr += ",";
+                }
+                if(options.newLines) {
+                    phpArrayStr += "\n";
+                }
             }
         }
         return phpArrayStr + " ".repeat(options.before) + ']';

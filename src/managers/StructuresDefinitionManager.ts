@@ -1,5 +1,6 @@
 import AbstractStructureConverter from "../converter/AbstractStructureConverter";
 import CurrentLangStructureConverter from "../converter/CurrentLangStructureConverter";
+import CurrentLangStructurePartialConverter from "../converter/fromCurrLang/CurrentLangStructurePartialConverter";
 import definitions from "../structures/definitions";
 import StructureDefinition from "../structures/StructureDefinition";
 import StructureDefinitionFactory from "../structures/StructureDefinitionFactory";
@@ -10,6 +11,7 @@ import capitalize from "../tools/tools";
 export interface StructureDefinitionManagerSetup {
     allowedStructures?: string[];
     disallowedStructures?: string[];
+    nativeLangConverters?: CurrentLangStructurePartialConverter[];
 }
 
 export default class StructuresDefinitionManager
@@ -17,6 +19,7 @@ export default class StructuresDefinitionManager
     #preloadedDefinitions : Map<string, StructureDefinition> = new Map();
     #loadedDefinitions : Map<string, StructureDefinition> = new Map();
     #exceptions : Exception[] = [];
+    #currLangConverter : CurrentLangStructureConverter;
 
     get errors() : Exception[] {
         return this.#exceptions;
@@ -27,11 +30,12 @@ export default class StructuresDefinitionManager
     }
 
     constructor(setup : StructureDefinitionManagerSetup) {
+        this.#currLangConverter = new CurrentLangStructureConverter();
         this.#config(setup);
         this.#loadDefinitions(setup);
     }
 
-    public convertTo(tgValue : string, fromType : string, toType : string) : string {
+    public convertTo(tgValue : string, fromType : string, toType : string, toOptions : Record<string, any> = {}) : string {
         try {
             if (!this.#loadedDefinitions.has(fromType)) {
                 throw new StructureConvertionException("Type converter " + fromType + " do not exists");
@@ -45,14 +49,13 @@ export default class StructuresDefinitionManager
             }
             console.log(toType, fromType, tgConverter);
             if (tgConverter.canConvert(toType)) {
-                return (tgConverter.convert(tgValue, toType) || '').toString();
+                return (tgConverter.convert(tgValue, toType, toOptions) || '').toString();
             } else {
-                const currLangConverter = new CurrentLangStructureConverter();
-                if (!currLangConverter.canConvert(toType)) {
+                if (!this.#currLangConverter.canConvert(toType)) {
                     throw new StructureConvertionException("Structure " + fromType + " cannot be converted from native lang to " + toType);
                 }
                 const currLangResult = tgConverter.convert(tgValue, 'currLang');
-                return (currLangConverter.convert(currLangResult, toType) || '').toString();
+                return (this.#currLangConverter.convert(currLangResult, toType, toOptions) || '').toString();
             }
         } catch(err) {
             if(err instanceof StructureConvertionException) {
@@ -63,7 +66,13 @@ export default class StructuresDefinitionManager
     }
 
     public getDefintionsNames() : string[] {
-        return Array.from(this.#preloadedDefinitions.keys());
+        const preloadedDefsNames = Array.from(this.#preloadedDefinitions.keys()) as string[];
+        const loadedDefsNames = Array.from(this.#loadedDefinitions.keys()) as string[];
+        return loadedDefsNames.concat(preloadedDefsNames);
+    }
+
+    public getCurrLangConverters() : string[] {
+        return this.#currLangConverter.valueOf();
     }
 
     public getDefinition(id : string) : StructureDefinition | null {
@@ -81,6 +90,11 @@ export default class StructuresDefinitionManager
         const isValid = this.#validateConfig(setup);
         if (isValid) {
             this.#loadDefinitions(setup);
+            if(Array.isArray(setup.nativeLangConverters)) {
+                for (const partialConverter of setup.nativeLangConverters) {
+                    this.#currLangConverter.registerConvertionMethod(partialConverter);
+                }
+            }
         } else {
 
         }

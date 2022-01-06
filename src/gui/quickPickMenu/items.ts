@@ -26,13 +26,29 @@ export default [
     // },
     {
         id:'PHPArray',
+        tgStruct:'PHPArray',
         label:'$(notebook-mimetype) PHP Array',
         description:'Convert structure to PHP array',
         detail:'PHP array with squere brackets',
         extension:'php'
     },
     {
+        id:'PHPArray',
+        tgStruct:'PHPArray',
+        primitive:'array',
+        label:'$(file-code) Minifed PHP Array',
+        description:'Convert structure to PHP array',
+        detail:'PHP array with squere brackets',
+        extension:'php',
+        convertionOptions:{
+            space:0,
+            newLines:false,
+            lastComma:false
+        }
+    },
+    {
         id:'JSON',
+        tgStruct:'JSON',
         label:'$(symbol-object) JSON',
         description:'Convert structure to pretty JSON',
         detail:'Pretty-printed JSON',
@@ -40,6 +56,7 @@ export default [
     },
     {
         id:'JSON',
+        tgStruct:'JSON',
         label:'$(file-code) Minified JSON',
         description:'Convert structure to minified JSON',
         detail:'Minified JSON',
@@ -55,13 +72,15 @@ export default [
     // },
     {
         id:'YAML',
+        tgStruct:'YAML',
         label:'$(symbol-constructor) YAML',
         extension:'yml'
     },
-    // {
-    //     id:'XML',
-    //     label:'XML'
-    // },
+    {
+        id:'XML',
+        label:'XML',
+        extension:'xml'
+    },
     // {
     //     id:'SQL',
     //     label:'SQL Bump',

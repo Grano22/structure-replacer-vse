@@ -7,7 +7,7 @@ import capitalize from "../tools/tools";
 export default abstract class AbstractStructureConverter {
     [key: string]: any;
 
-    #exceptions : StructureConvertionException[] = [];
+    #exceptions : Map<string, StructureConvertionException[]> = new Map();
 
     constructor(converterConfig : any = {}) {
         
@@ -27,11 +27,18 @@ export default abstract class AbstractStructureConverter {
             }
             return this['to' + capitalize(tgMethodName)](structure, options);
         } catch (exc) {
+            if(exc instanceof StructureConvertionException) {
+                this.pathException(exc);
+            }
             return null;
         }
     };
 
-    public pathException(exc : StructureConvertionException): void {
-        this.#exceptions.push(exc);
+    public pathException(exc : StructureConvertionException, converterTarget : string = 'universal'): void {
+        if(!this.#exceptions.has(converterTarget))
+        {
+            this.#exceptions.set(converterTarget, []);
+        }
+        this.#exceptions?.get(converterTarget)?.push(exc);
     }
 }
