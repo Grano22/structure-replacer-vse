@@ -1,6 +1,8 @@
 import AbstractStructureConverter from "../converter/AbstractStructureConverter";
 import CurrentLangStructureConverter from "../converter/CurrentLangStructureConverter";
 import CurrentLangStructurePartialConverter from "../converter/fromCurrLang/CurrentLangStructurePartialConverter";
+import CurrentLangStructureSorter from "../sorter/CurrentLangStructureSorter";
+import SortStrategies from "../sorter/SortStrategies";
 import definitions from "../structures/definitions";
 import StructureDefinition from "../structures/StructureDefinition";
 import StructureDefinitionFactory from "../structures/StructureDefinitionFactory";
@@ -16,10 +18,13 @@ export interface StructureDefinitionManagerSetup {
 
 export default class StructuresDefinitionManager
 {
+    static readonly currLangConvertId = "currLang";
+
     #preloadedDefinitions : Map<string, StructureDefinition> = new Map();
     #loadedDefinitions : Map<string, StructureDefinition> = new Map();
     #exceptions : Exception[] = [];
     #currLangConverter : CurrentLangStructureConverter;
+    #currLangSorter : CurrentLangStructureSorter;
 
     get errors() : Exception[] {
         return this.#exceptions;
@@ -30,9 +35,55 @@ export default class StructuresDefinitionManager
     }
 
     constructor(setup : StructureDefinitionManagerSetup) {
+        this.#currLangSorter = new CurrentLangStructureSorter();
         this.#currLangConverter = new CurrentLangStructureConverter();
         this.#config(setup);
         this.#loadDefinitions(setup);
+    }
+
+    public sort(tgValue : Record<string, any>, type = SortStrategies.ALPHABETICAL, by = SortStrategies.BY_KEYS) : Record<string, any> {
+        try {
+            return this.#currLangSorter.sort(tgValue, type, by);
+        } catch(err) {
+            return tgValue;
+        }
+    }
+
+    public convertFromCurrLang(tgValue : Record<string, any>, toType : string) : string {
+        try {
+            return (this.#currLangConverter.convert(tgValue, toType) || '').toString();
+        } catch(err) {
+            if(err instanceof StructureConvertionException) {
+                this.#addException(err);
+            }
+            return '';
+        }
+    }
+
+    public convertToCurrLang(tgValue : string, fromType : string) : Record<string, any> | null
+    {
+        try {
+            const tgStruct = this.#loadedDefinitions.get(fromType), tgConverter = tgStruct?.converters["*"];
+            if (typeof tgConverter === "undefined" || tgConverter === null) {
+                throw new StructureConvertionException("Structure " + fromType + " do not have any converters");
+            }
+            if (!(tgConverter instanceof AbstractStructureConverter)) {
+                throw new StructureConvertionException("Structure " + fromType + " converter is invaild");
+            }
+            const convertionResult = tgConverter.convert(tgValue, 'currLang');
+            if (
+                typeof convertionResult === "undefined" || convertionResult === null
+                && tgConverter.lastException instanceof StructureConvertionException
+            ) {
+                throw tgConverter.lastException;
+            }
+            return convertionResult;
+        } catch(err) {
+            if(err instanceof StructureConvertionException) {
+                this.#addException(err);
+            }
+            return null;
+        }
     }
 
     public convertTo(tgValue : string, fromType : string, toType : string, toOptions : Record<string, any> = {}) : string {

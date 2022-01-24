@@ -11,10 +11,12 @@ describe('Unit test for structure defnition manager', ()=>{
     });
 
     it("Test if manage don't have errors", () => {
+        // Assert
         assert.isFalse(structDefMng.hasErrors);
     });
 
     it('Test if given loaded structures is covered', () => {
+        // Assert
         assert.deepEqual(expectedStructs, structDefMng.getDefintionsNames());
     });
 });

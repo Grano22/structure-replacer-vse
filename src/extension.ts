@@ -18,6 +18,7 @@ import ToPHPArrayStructureConverter from './converter/fromCurrLang/ToPHPArrayStr
 import SidepanelMenuProivder from './gui/sidepanel/SidepanelMenuProvider';
 import DataReplacerExtensionFasade from './fasades/DataReplacerExtensionFasade';
 import ToXMLStructureConverter from './converter/fromCurrLang/ToXMLStructureConverter';
+import ToURLEncodedParamsStructureConverter from './converter/fromCurrLang/ToURLEncodedParamsStructureConverter';
 
 export async function activate(context: vscode.ExtensionContext) {
 	const extensionSettings : ExtensionSettings = vscode.workspace.getConfiguration('vestibule-bs') as ExtensionSettings;
@@ -29,6 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			new ToPHPArrayStructureConverter(),
 			new ToYMLStructureConverter(),
 			new ToSQLTableDefinitionStructureConverter(),
+			new ToURLEncodedParamsStructureConverter(),
 			new ToXMLStructureConverter()
 		]
 	}),
@@ -195,6 +197,51 @@ export async function activate(context: vscode.ExtensionContext) {
 					structValidator.validate(selection);
 				}
 			}
+		});
+	});
+
+	disposable['SortDataStruct'] = vscode.commands.registerCommand('data_replacer.sort_alphanumerical_data_structure', () => {
+		var editor = vscode.window.activeTextEditor;
+
+		if (!editor) {
+			return;
+		}
+
+		var selection = editor.selection;
+		var selectedAllRange = editor.document.getText(selection);
+
+		if (selectedAllRange.length <= 0) {
+			vscode.window.showInformationMessage('Any text required to data structure operation');
+			return;
+		}
+
+		const structureDetector = new StructureDetector(extensionSettings);
+		const structureID = structureDetector.detect(selectedAllRange, {
+			language: editor.document.languageId
+		});
+
+		if (structureID === '') {
+			vscode.window.showErrorMessage('Source structure cannot be matched. ' + structureDetector.reason);
+			return;
+		}
+
+		const outputStruct = structMng.convertToCurrLang(selectedAllRange, structureID);
+		if (outputStruct === null || structMng.hasErrors) {
+			vscode.window.showErrorMessage(`Failed to convert from ${structureID} to ${StructuresDefinitionManager.currLangConvertId} structure type due to ${structMng.errors.join("\n")}`);
+			return;
+		}
+
+		const sortedOutputStruct = structMng.sort(outputStruct);
+
+		const sortedStruct = structMng.convertFromCurrLang(sortedOutputStruct, structureID);
+
+		if (sortedStruct === '') {
+			vscode.window.showErrorMessage('Failed to sort data structure.');
+			return;
+		}
+
+		editor?.edit(editorBuilder => {
+			editorBuilder.replace(selection, sortedStruct);
 		});
 	});
 

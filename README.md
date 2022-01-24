@@ -21,6 +21,6 @@ Supported structures (two way converting):
 
 ## How to use
 
-![How to use commands](extension/images/howtouse_commands.gif)
+![How to use commands](images/howtouse_commands.gif)
 
 **Enjoy!**

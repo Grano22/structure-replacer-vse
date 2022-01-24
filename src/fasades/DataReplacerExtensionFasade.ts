@@ -2,7 +2,7 @@ import StructuresDefinitionManager from "../managers/StructuresDefinitionManager
 
 export default class DataReplacerExtensionFasade {
     #structDefManager : StructuresDefinitionManager;
-    #settings : ExtensionSettings
+    #settings : ExtensionSettings;
 
     constructor(structDefManager: StructuresDefinitionManager, settings : ExtensionSettings) {
         this.#structDefManager = structDefManager;

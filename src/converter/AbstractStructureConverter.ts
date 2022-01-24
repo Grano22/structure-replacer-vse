@@ -9,6 +9,18 @@ export default abstract class AbstractStructureConverter {
 
     #exceptions : Map<string, StructureConvertionException[]> = new Map();
 
+    get exceptions() : StructureConvertionException[]
+    {
+        const exceptions = this.#exceptions.get('universal');
+        return Array.isArray(exceptions) ? exceptions : [];
+    }
+
+    get lastException() : StructureConvertionException | null
+    {
+        const exceptions = this.#exceptions.get('universal');
+        return Array.isArray(exceptions) ? (exceptions[exceptions.length - 1] || null) : null;
+    }
+
     constructor(converterConfig : any = {}) {
         
     }
@@ -23,7 +35,7 @@ export default abstract class AbstractStructureConverter {
         try {
             const tgMethodName = tgStructID;
             if(!this.canConvert(tgStructID)) {
-                throw new Exception("Convertion type " + tgMethodName + " not found in " + this.constructor.name);
+                throw new StructureConvertionException("Convertion type " + tgMethodName + " not found in " + this.constructor.name);
             }
             return this['to' + capitalize(tgMethodName)](structure, options);
         } catch (exc) {

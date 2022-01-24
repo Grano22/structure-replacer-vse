@@ -81,6 +81,14 @@ export default [
         label:'XML',
         extension:'xml'
     },
+    {
+        id:'urlEncodedParams',
+        tgStruct:'urlEncodedParams',
+        label:'$(file-code) URL Encoded Params',
+        description:'Convert structure to URL Encoded Params',
+        detail:'URL Encoded Params',
+        extension:'http'
+    },
     // {
     //     id:'SQL',
     //     label:'SQL Bump',

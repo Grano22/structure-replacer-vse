@@ -12,7 +12,7 @@
     "url": "https://github.com/Grano22/structure-replacer-vse"
   },
   "description": "Data replacer is a extension to convert between data structures",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "engines": {
     "vscode": "^1.62.0"
   },
@@ -21,6 +21,8 @@
     "workspace"
   ],
   "categories": [
+    "Programming Languages",
+    "Formatters",
     "Other"
   ],
   "activationEvents": [
@@ -40,6 +42,10 @@
       {
         "command": "data_replacer.validate_data_structure",
         "title": "Validate data structure"
+      },
+      {
+        "command": "data_replacer.sort_alphanumerical_data_structure",
+        "title": "Sort data structure"
       }
     ],
     "viewsContainers": {
@@ -83,7 +89,8 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "unit-test": "./node_modules/mocha/bin/mocha ./src/test/unit/src/**/*.spec.ts --require ts-node/register"
+    "unit": "bash ./bin/runUnitTest.sh",
+    "units": "./node_modules/mocha/bin/mocha ./src/test/unit/src/test/**/*.spec.ts --require ts-node/register"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
@@ -111,6 +118,7 @@
     "php-parser": "^3.0.3",
     "ts-node": "^10.4.0",
     "xmldom": "^0.6.0",
+    "yaml": "^1.10.2",
     "yamljs": "^0.3.0"
   }
 }

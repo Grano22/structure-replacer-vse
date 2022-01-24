@@ -1,6 +1,7 @@
 import { CancellationToken, Uri, Webview, WebviewView, WebviewViewProvider, WebviewViewResolveContext } from 'vscode';
 import DataReplacerExtensionFasade from '../../fasades/DataReplacerExtensionFasade';
-import { getExtensionURI, getNonce } from '../../tools/tools';
+import { getNonce } from '../../tools/tools';
+import { getExtensionURI } from '../../tools/vscodeTools';
 
 export default class SidepanelMenuProivder implements WebviewViewProvider {
     public static readonly viewType = 'dataReplacer.structureView';

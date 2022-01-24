@@ -5,7 +5,7 @@
 
 ## V 0.0.12
 
-* Add default convertion attribites provider
+* Add default convertion attributes provider
 * Add support for current lang stringify converters to load and create ittself during build manager\
 * Add to sql one-way convertion support
 * Validation command

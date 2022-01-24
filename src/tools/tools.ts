@@ -1,5 +1,3 @@
-import { Uri, Webview } from "vscode";
-
 export default function capitalize(str : string) : string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -14,6 +12,12 @@ export function getNonce() {
     return text;
 }
 
-export function getExtensionURI(webview: Webview, extensionUri: Uri, pathList: string[]) {
-    return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
+export function countChars(str : string, tgChar : string) : number {
+  let result = 0;
+  for (let i = 0;i<str.length;i++) {
+    if(str[i]===tgChar) {
+        result++;
+    }
+  }
+  return result;
 }

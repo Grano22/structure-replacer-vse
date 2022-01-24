@@ -1,6 +1,7 @@
 import JSONStructureConverter from "../converter/JSONStructureConverter";
 import PHPArrayStructureConverter from "../converter/PHPArrayStructureConverter";
 import TextPairsStructureConverter from "../converter/TextPairsStructureConverter";
+import URLEncodedParamsStructureConverter from "../converter/URLEncodedParamsStructureConverter";
 import XMLStructureConverter from "../converter/XMLStructureConverter";
 import YMLStructureConverter from "../converter/YMLStructureConverter";
 import JSONStructureValidator from "../validators/JSONStructureValidator";
@@ -83,6 +84,19 @@ export default [
         ],
         converters: {
             "*": XMLStructureConverter
+        }
+    },
+    {
+        id:'urlEncodedParams',
+        name:'UrlEncodedParams',
+        preferredMimes: ['application/x-www-form-urlencoded'],
+        languageContexts: ['urlencoded'],
+        languages: ['urlencoded'],
+        validators: [
+
+        ],
+        converters: {
+            "*": URLEncodedParamsStructureConverter
         }
     }
 ];
